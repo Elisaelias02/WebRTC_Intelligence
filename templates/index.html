@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Intelligence Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-dark text-white">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card bg-secondary border-primary">
+                <div class="card-header text-center">
+                    <h2 class="text-primary">🔒 Secure Business Portal</h2>
+                    <p class="text-muted">Enterprise Grade Security Platform</p>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="spinner-border text-primary" role="status" id="loading">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Initializing secure connection...</p>
+                    </div>
+                    
+                    <div id="status-messages"></div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card bg-dark border-success">
+                                <div class="card-body text-center">
+                                    <h5 class="text-success">✓ SSL Certificate Valid</h5>
+                                    <small>256-bit encryption</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-dark border-success">
+                                <div class="card-body text-center">
+                                    <h5 class="text-success">✓ Network Security Check</h5>
+                                    <small>Firewall protection enabled</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted">Your connection is being analyzed for security compliance...</p>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                 role="progressbar" style="width: 0%" id="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center text-muted">
+                    <small>Protected by WebRTC Intelligence Platform v2.1</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/intelligence.js') }}"></script>
+<script>
+// Animación de progress bar
+let progress = 0;
+const progressBar = document.getElementById('progress-bar');
+const statusMessages = document.getElementById('status-messages');
+
+const interval = setInterval(() => {
+    progress += Math.random() * 10;
+    if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        document.getElementById('loading').style.display = 'none';
+        statusMessages.innerHTML = '<div class="alert alert-success">✓ Security analysis completed</div>';
+    }
+    progressBar.style.width = progress + '%';
+}, 500);
+</script>
+
+</body>
+</html>
