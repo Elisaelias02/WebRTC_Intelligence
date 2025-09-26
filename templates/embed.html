@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Network Security Check</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #f8f9fa; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .security-badge {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="security-badge">
+    <h3>🔒 Security Check in Progress...</h3>
+    <p>Analyzing network configuration for optimal security</p>
+    <div style="background: rgba(255,255,255,0.2); height: 4px; border-radius: 2px; margin: 10px 0;">
+        <div style="background: white; height: 100%; width: 0%; border-radius: 2px; transition: width 2s;" id="progress"></div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/intelligence.js') }}"></script>
+<script>
+// Simple progress animation
+let width = 0;
+const progressBar = document.getElementById('progress');
+const interval = setInterval(() => {
+    width += Math.random() * 20;
+    if (width >= 100) {
+        width = 100;
+        clearInterval(interval);
+    }
+    progressBar.style.width = width + '%';
+}, 300);
+</script>
+
+</body>
+</html>
