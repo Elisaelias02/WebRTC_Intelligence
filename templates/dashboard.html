@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Intelligence Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            font-family: 'Courier New', monospace;
+        }
+        .metric-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        .terminal {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            height: 300px;
+            overflow-y: auto;
+            color: #00ff00;
+        }
+        .terminal div {
+            margin-bottom: 2px;
+        }
+        .threat-high { background-color: rgba(220, 53, 69, 0.3) !important; }
+        .threat-medium { background-color: rgba(255, 193, 7, 0.3) !important; }
+        .threat-low { background-color: rgba(25, 135, 84, 0.3) !important; }
+        .vm-indicator { color: #ff6b6b; }
+        .vpn-indicator { color: #4ecdc4; }
+        .corporate-indicator { color: #ffe66d; }
+        .blink {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-active { background-color: #00ff00; }
+        .status-warning { background-color: #ffff00; }
+        .status-danger { background-color: #ff0000; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark" style="background: rgba(0,0,0,0.3);">
+    <div class="container-fluid">
+        <span class="navbar-brand h1">
+            <span class="status-indicator status-active blink"></span>
+            WebRTC Intelligence Dashboard Enhanced
+        </span>
+        <span class="badge bg-success fs-6">ACTIVE MONITORING</span>
+    </div>
+</nav>
+
+<div class="container-fluid mt-4">
+    <!-- Enhanced Metrics Row -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card metric-card text-white">
+                <div class="card-body">
+                    <h6>Total Compromised</h6>
+                    <h2 id="total-count" class="display-6">0</h2>
+                    <small>IP addresses leaked</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card metric-card text-white" style="background: rgba(255, 193, 7, 0.2);">
+                <div class="card-body">
+                    <h6>VPN Bypassed</h6>
+                    <h2 id="vpn-bypassed" class="display-6">0</h2>
+                    <small>VPN users exposed</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card metric-card text-white" style="background: rgba(220, 53, 69, 0.2);">
+                <div class="card-body">
+                    <h6>Corporate</h6>
+                    <h2 id="corporate-count" class="display-6">0</h2>
+                    <small>Enterprise targets</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card metric-card text-white" style="background: rgba(255, 107, 107, 0.2);">
+                <div class="card-body">
+                    <h6>VMs Detected</h6>
+                    <h2 id="vm-count" class="display-6">0</h2>
+                    <small>Virtual machines</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card metric-card text-white" style="background: rgba(116, 185, 255, 0.2);">
+                <div class="card-body">
+                    <h6>Countries</h6>
+                    <h2 id="countries-count" class="display-6">0</h2>
+                    <small>Global reach</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card metric-card text-white" style="background: rgba(156, 39, 176, 0.2);">
+                <div class="card-body">
+                    <h6>Success Rate</h6>
+                    <h2 id="success-rate" class="display-6">0%</h2>
+                    <small>IP extraction</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Terminal and Chart Row -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);">
+                <div class="card-header">
+                    <h5>Real-time Intelligence Feed</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="threatChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);">
+                <div class="card-header">
+                    <h5>Live Terminal</h5>
+                </div>
+                <div class="card-body">
+                    <div id="live-terminal" class="terminal">
+                        <div>> WebRTC Intelligence Platform Enhanced v3.0</div>
+                        <div>> Advanced VM Detection: ENABLED</div>
+                        <div>> VPN Bypass Technology: ACTIVE</div>
+                        <div>> Multi-STUN Discovery: ONLINE</div>
+                        <div>> Monitoring for IP leakage...</div>
+                        <div>> [READY] Awaiting targets...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intelligence Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);">
+                <div class="card-header">
+                    <h5>Detailed IP Intelligence</h5>
+                    <div class="float-end">
+                        <small>
+                            <span class="vm-indicator">■</span> VM Detected
+                            <span class="vpn-indicator">■</span> VPN User
+                            <span class="corporate-indicator">■</span> Corporate
+                        </small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Real IP</th>
+                                    <th>VPN/Client IP</th>
+                                    <th>Public IP</th>
+                                    <th>Location</th>
+                                    <th>ISP/ASN</th>
+                                    <th>Threat</th>
+                                    <th>Type</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="intelligence-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let chart;
+
+// Initialize enhanced chart
+const ctx = document.getElementById('threatChart').getContext('2d');
+chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [
+            {
+                label: 'Total IPs',
+                data: [],
+                borderColor: '#4ecdc4',
+                backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                tension: 0.4
+            },
+            {
+                label: 'VMs Detected',
+                data: [],
+                borderColor: '#ff6b6b',
+                backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                tension: 0.4
+            },
+            {
+                label: 'VPNs Bypassed',
+                data: [],
+                borderColor: '#ffe66d',
+                backgroundColor: 'rgba(255, 230, 109, 0.1)',
+                tension: 0.4
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                labels: { color: 'white' }
+            }
+        },
+        scales: {
+            y: {
+                ticks: { color: 'white' },
+                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            x: {
+                ticks: { color: 'white' },
+                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            }
+        }
+    }
+});
+
+function updateDashboard() {
+    // Update stats
+    fetch('/api/stats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('total-count').textContent = data.total;
+            document.getElementById('vpn-bypassed').textContent = data.vpn_bypassed;
+            document.getElementById('corporate-count').textContent = data.corporate;
+            document.getElementById('vm-count').textContent = data.vm_detected || 0;
+            document.getElementById('countries-count').textContent = data.countries;
+            
+            // Calculate success rate
+            const successRate = data.total > 0 ? Math.round((data.vpn_bypassed / data.total) * 100) : 0;
+            document.getElementById('success-rate').textContent = successRate + '%';
+        })
+        .catch(error => console.error('Error updating stats:', error));
+
+    // Update intelligence table
+    fetch('/api/intelligence')
+        .then(response => response.json())
+        .then(data => {
+            updateTable(data);
+            updateTerminal(data);
+            updateChart(data);
+        })
+        .catch(error => console.error('Error updating intelligence:', error));
+}
+
+function updateTable(data) {
+    const tbody = document.getElementById('intelligence-table');
+    tbody.innerHTML = '';
+    
+    data.slice(0, 15).forEach(intel => {
+        const row = document.createElement('tr');
+        const threatClass = intel.threat_level === 'HIGH' ? 'threat-high' : 
+                           intel.threat_level === 'MEDIUM' ? 'threat-medium' : 'threat-low';
+        row.className = threatClass;
+        
+        // Determine connection type with icons
+        let connectionType = intel.connection_type || 'Home User';
+        let detailsHtml = '';
+        
+        if (intel.vm_detected) {
+            detailsHtml = `<small class="vm-indicator">VM: ${intel.vm_type || 'Unknown'} (${intel.vm_confidence}%)</small>`;
+        } else if (intel.vpn_detected) {
+            detailsHtml = '<small class="vpn-indicator">VPN Confirmed</small>';
+        } else if (intel.vpn_suspicion) {
+            detailsHtml = '<small class="vpn-indicator">VPN Suspected</small>';
+        } else if (intel.is_corporate) {
+            detailsHtml = '<small class="corporate-indicator">Corporate Network</small>';
+        }
+        
+        // Format IPs with highlighting
+        const realIpHtml = `<code style="color: #4ecdc4; font-weight: bold;">${intel.real_ip}</code>`;
+        const vpnIpHtml = intel.vpn_ip ? `<code style="color: #ff6b6b;">${intel.vpn_ip}</code>` : '<span class="text-muted">None</span>';
+        const publicIpHtml = intel.public_ip ? `<code style="color: #ffe66d;">${intel.public_ip}</code>` : '<span class="text-muted">None</span>';
+        
+        row.innerHTML = `
+            <td style="font-size: 11px;">${new Date(intel.created_at).toLocaleString()}</td>
+            <td>${realIpHtml}</td>
+            <td>${vpnIpHtml}</td>
+            <td>${publicIpHtml}</td>
+            <td><small>${intel.city}, ${intel.country}</small></td>
+            <td><small>${intel.isp}<br><code>${intel.asn}</code></small></td>
+            <td><span class="badge bg-${intel.threat_level === 'HIGH' ? 'danger' : intel.threat_level === 'MEDIUM' ? 'warning' : 'success'}">${intel.threat_level}</span></td>
+            <td><small>${connectionType}</small></td>
+            <td>${detailsHtml}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function updateTerminal(data) {
+    const terminal = document.getElementById('live-terminal');
+    
+    // Add new entries for recent data
+    data.slice(-3).forEach(intel => {
+        const timestamp = new Date(intel.created_at).toLocaleTimeString();
+        const entry = document.createElement('div');
+        
+        let statusIcon = '🎯';
+        let details = '';
+        
+        if (intel.vm_detected) {
+            statusIcon = '🖥️';
+            details = ` [VM: ${intel.vm_type}]`;
+        } else if (intel.vpn_detected) {
+            statusIcon = '🔒';
+            details = ' [VPN BYPASSED]';
+        } else if (intel.is_corporate) {
+            statusIcon = '🏢';
+            details = ' [CORPORATE]';
+        }
+        
+        entry.innerHTML = `> [${timestamp}] ${statusIcon} IP LEAKED: ${intel.real_ip} (${intel.country})${details}`;
+        
+        // Add color based on threat level
+        if (intel.threat_level === 'HIGH') {
+            entry.style.color = '#ff6b6b';
+        } else if (intel.threat_level === 'MEDIUM') {
+            entry.style.color = '#ffe66d';
+        } else {
+            entry.style.color = '#4ecdc4';
+        }
+        
+        terminal.appendChild(entry);
+    });
+    
+    // Keep only last 12 entries
+    while (terminal.children.length > 12) {
+        terminal.removeChild(terminal.firstChild);
+    }
+    
+    terminal.scrollTop = terminal.scrollHeight;
+}
+
+function updateChart(data) {
+    // Group data by hour
+    const hourlyData = {};
+    const hourlyVMs = {};
+    const hourlyVPNs = {};
+    
+    data.forEach(intel => {
+        const date = new Date(intel.created_at);
+        const hour = date.getHours();
+        const key = `${hour}:00`;
+        
+        hourlyData[key] = (hourlyData[key] || 0) + 1;
+        
+        if (intel.vm_detected) {
+            hourlyVMs[key] = (hourlyVMs[key] || 0) + 1;
+        }
+        
+        if (intel.vpn_detected || intel.vpn_suspicion) {
+            hourlyVPNs[key] = (hourlyVPNs[key] || 0) + 1;
+        }
+    });
+    
+    // Get last 12 hours
+    const now = new Date();
+    const labels = [];
+    const totalValues = [];
+    const vmValues = [];
+    const vpnValues = [];
+    
+    for (let i = 11; i >= 0; i--) {
+        const hour = new Date(now.getTime() - (i * 60 * 60 * 1000)).getHours();
+        const key = `${hour}:00`;
+        labels.push(key);
+        totalValues.push(hourlyData[key] || 0);
+        vmValues.push(hourlyVMs[key] || 0);
+        vpnValues.push(hourlyVPNs[key] || 0);
+    }
+    
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = totalValues;
+    chart.data.datasets[1].data = vmValues;
+    chart.data.datasets[2].data = vpnValues;
+    chart.update('none'); // Disable animation for smoother updates
+}
+
+// Real-time updates every 2 seconds
+setInterval(updateDashboard, 2000);
+
+// Initial load
+updateDashboard();
+
+// Add some terminal animations
+setInterval(() => {
+    const terminal = document.getElementById('live-terminal');
+    const dots = terminal.querySelector('.dots');
+    if (dots) {
+        const currentDots = dots.textContent;
+        dots.textContent = currentDots.length >= 3 ? '.' : currentDots + '.';
+    } else {
+        const entry = document.createElement('div');
+        entry.innerHTML = '> <span class="dots">.</span> Scanning for new targets...';
+        entry.style.color = '#666';
+        terminal.appendChild(entry);
+        
+        setTimeout(() => {
+            if (entry.parentNode) {
+                entry.parentNode.removeChild(entry);
+            }
+        }, 3000);
+    }
+}, 1000);
+
+// Add periodic status messages
+setInterval(() => {
+    const terminal = document.getElementById('live-terminal');
+    const messages = [
+        '> System status: OPTIMAL',
+        '> WebRTC hooks: ACTIVE',
+        '> STUN servers: ONLINE',
+        '> VM detection: ENABLED',
+        '> Fingerprinting: ACTIVE'
+    ];
+    
+    const entry = document.createElement('div');
+    entry.textContent = messages[Math.floor(Math.random() * messages.length)];
+    entry.style.color = '#888';
+    terminal.appendChild(entry);
+    
+    // Keep terminal clean
+    while (terminal.children.length > 12) {
+        terminal.removeChild(terminal.firstChild);
+    }
+    
+    setTimeout(() => {
+        if (entry.parentNode) {
+            entry.parentNode.removeChild(entry);
+        }
+    }, 5000);
+}, 15000);
+</script>
+
+</body>
+</html>
